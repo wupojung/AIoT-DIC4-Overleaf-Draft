@@ -1,0 +1,64 @@
+% Generated from 05-experiment.md by generate.py.
+\section{Experiment}
+\label{sec:evaluation}
+
+\subsection{Observed Snapshot Audit}
+\label{sec:data}
+The project team's exploratory audit used the Taichung City Land Administration Bureau sales CSV labeled July--September of ROC year 115 (2026) under dataset 103038 \cite{taichung}.\footnote{Resource \texttt{1095e2c3-4ccc-4766-b1ce-98aa2ddf0204}. SHA-256 \texttt{6efc5b04\allowbreak{}9e1e64cf\allowbreak{}438ac36f\allowbreak{}d243ae7e\allowbreak{}b92a98ba\allowbreak{}851f5d8e\allowbreak{}0cf71134\allowbreak{}b6142eac}.} Using transaction subject and building type, the exploratory filter retained \emph{land and building} and \emph{land, building, and parking} transactions belonging to four selected building types. Parsing the official CSV and reapplying those category filters reproduced the audit counts in Table~\ref{tab:snapshot}. The retained subset comprises 86.0\% of the release. Its share describes the effect of the filter on the published records.
+
+
+\begin{table}[t]
+\caption{Observed Counts Reported in the Single-Snapshot Audit}
+\label{tab:snapshot}
+\centering
+\begin{tabularx}{\columnwidth}{@{}Xr@{}}
+\toprule
+Audit item & Count \\
+\midrule
+Raw records & 10,638 \\
+Source fields & 32 \\
+Residential candidates & 9,152 \\
+\quad Elevator buildings, 11 floors or more & 5,933 \\
+\quad Elevator buildings, 10 floors or fewer & 1,553 \\
+\quad Townhouses & 1,461 \\
+\quad Walk-up apartments, 5 floors or fewer & 205 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+The quarter is the publication batch label. The comparison fields include district, transaction subject, building type, total price (NTD), building area (square metres), and the separately reported parking price and area. The audit used the two classification fields for eligibility counts. The business meaning of the encoded ROC year-month field remains unconfirmed for this extract, so the audit cannot establish transaction-quarter coverage. The team classified the snapshot as conditionally feasible for further schema and eligibility review. Historical coverage, the final study population, and any supervised prediction target remain open. The reported counts give no estimate of agent reliability or model accuracy.
+
+\subsection{Cohort Construction and Price Conventions}
+The proposed ingestion process records the source URL, release identifier, retrieval time, checksum, and schema version. The query records the exact inclusion predicate and transformation version. Before enabling a period-based comparison, the team will verify the data dictionary and distinguish transaction dates from registration and publication dates wherever the corresponding fields exist. The data audit will check missing values, possible duplicates, parking fields, and coverage by district and building type. It will document the effect of each eligibility rule on the count.
+
+For a parking-excluded comparison, let \(P_i\) denote the reported transfer price in New Taiwan dollars and \(A_i\) the compatible transfer area in square metres. Let \(P_{i,p}\) and \(A_{i,p}\) denote the separately reported parking price and area. The proposed rule is
+
+\begin{equation}
+u_i = \frac{P_i-P_{i,p}}{A_i-A_{i,p}},
+\qquad A_i>A_{i,p}.
+\label{eq:unitprice}
+\end{equation}
+
+The rule applies only when the components use compatible source definitions and satisfy the schema and validity checks. For a confirmed sale without parking, both parking components are zero. A sale with a missing required component is excluded from the parking-adjusted metric and may enter a separately labeled bundled-price analysis if eligible. If a comparison instead uses a source-provided unit price, the response identifies that field and the source's parking convention \cite{moi}.
+
+For an eligible cohort, the descriptive tool reports the sample count and, where support permits, the median and interquartile range. The median summarizes the per-record unit prices computed using \eqref{eq:unitprice}. The MOI's aggregate average divides summed prices by summed areas \cite{moi}. The response names the statistic and provides the metric definition, units, applicable period, and exclusion count. A minimum support rule, to be fixed before the evaluation, determines when a cohort is too sparse to report a numerical result.
+
+\subsection{Data and Analytics Evaluation}
+The first stage verifies the date and area fields, historical coverage, source permissions, and residential inclusion rules. Evaluators will independently reconstruct reference cohort counts and statistics from frozen snapshots. Test cases will include missing parking components, invalid adjusted area, and sparse cohorts. The evaluation will measure numerical agreement under a common rounding rule and the correctness of inclusion and exclusion decisions.
+
+If eligible historical data and a defensible target are available, a secondary experiment will compare an area-and-time median baseline, a linear model, and a tree-based model using a common target and feature availability rules. Training data precede the held-out period. Preprocessing, aggregate features, and tuning use only training data. A spatial holdout will be considered where geographic transfer matches the intended use and the data support it. Planned measures include mean absolute error, root mean squared error, \(R^2\), and errors by property type and geographic subgroup. A model output would be exposed only for inputs inside its validated scope.
+
+\subsection{Paired Agent Evaluation}
+The fixed workflow follows a predefined sequence with conditional branches for clarification, retrieval, and failure. The adaptive workflow allows the bounded ReAct controller to select the next step based on validated observations. Both arms share the task inputs, query parser, data and document versions, available tools, audit policy, and response requirements. Where the arms use a language model for query interpretation or answer assembly, those shared tasks use the same model and settings. Both arms use the same request resource limits. Before the runs, the team will record the hardware and software versions, model identifier, prompts, decoding settings, fixtures, and per-request time and token budgets. These settings remain to be selected.
+
+The paired task set will include routine district comparisons, ambiguous questions, stale or conflicting documents, transient failures, missing core records, and invalid optional outputs. The reference for each case specifies the expected decision, necessary evidence, acceptable caveats, and claims that must be withheld. Appropriate clarification and safe stops can count as successful task completion. Results will be stratified by routine, multi-step, and failure cases to identify where the choice of controller matters.
+
+The evaluation will freeze the task set and scoring rubric before the test runs. Cases involving transient failures or contradictory documents will use controlled fixtures so that both workflows encounter equivalent evidence conditions. Reviewers will score the final responses against the reference without seeing which workflow produced them. They will resolve disagreements against the underlying tool outputs and source passages. Execution traces will be scored separately to identify failures that the final answer alone cannot reveal.
+
+Supported task completion is the fraction of evaluated cases meeting the case-specific decision and evidence rubric. Citation support is the fraction of auditable claims whose cited evidence supports their content and scope. The report will give claim counts alongside this measure and separately count responses with unsupported price claims. Among cases whose reference requires withholding a price, we will measure correct abstention. Among answerable cases, we will measure unnecessary abstention. Tool traces will be checked for invalid arguments, unauthorized actions, and violations of step and retry limits. Efficiency measures include median and 95th-percentile latency, calls per query, and model token use under common execution conditions.
+
+The analysis will report paired differences and uncertainty intervals from resampling task cases, grouping variants derived from the same template. If the controller is stochastic, repeated runs will retain their case identifiers so that repetitions are analyzed within a case. Task-template coverage, grader disagreement, and stochastic outputs can limit the interpretation of a paired difference. A separate comprehension study, if feasible, will assess whether readers can identify the comparison period, explain the price convention, and distinguish a disclosed-sample statistic from a property-level estimate.
+
+
+No paired Agent runs, supervised training runs, or user studies were available for this manuscript. The counts in Table~\ref{tab:snapshot} are the observed findings.

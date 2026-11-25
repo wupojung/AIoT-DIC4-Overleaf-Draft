@@ -1,0 +1,20 @@
+% Adapted from the single-file draft and the team design, Sections 7--8.
+\begin{tikzpicture}[
+  block/.style={draw, rounded corners=2pt, align=center, font=\footnotesize,
+    minimum height=6mm, inner xsep=4pt, inner ysep=3pt, fill=black!4},
+  edge/.style={-{Stealth[length=2mm]}, semithick},
+  node distance=4mm]
+  \node[block] (query) {Dashboard and typed query};
+  \node[block, below=of query] (agent) {Bounded ReAct controller};
+  \node[block, below=8mm of agent, xshift=-19mm] (data) {Transaction search\\and calculation};
+  \node[block, below=8mm of agent, xshift=19mm] (rag) {Versioned domain\\document retrieval};
+  \node[block, below=24mm of agent] (gate) {Evidence and claim validation};
+  \node[block, below=of gate] (answer) {Cited answer, partial answer, or safe stop};
+  \draw[edge] (query) -- (agent);
+  \draw[edge] (agent.south) -- (data.north);
+  \draw[edge] (agent.south) -- (rag.north);
+  \draw[edge] (data.south) -- (gate.north);
+  \draw[edge] (rag.south) -- (gate.north);
+  \draw[edge] (gate) -- (answer);
+  \draw[edge,dashed] (gate.east) -- ++(20mm,0) |- (agent.east);
+\end{tikzpicture}

@@ -1,0 +1,12 @@
+% Generated from 03-related-work.md by generate.py.
+\section{Related Work}
+\label{sec:related}
+\subsection{Housing Analytics and Spatial Evidence}
+Wang \emph{et al.} combine transaction attributes, public-facility information, and satellite imagery in a price prediction model evaluated on historical Taipei and New Taipei sales \cite{wang}. Their study motivates the conditional use of location features when source quality and spatial precision support the task. Descriptive comparison starts from a different question about the observed distribution within an explicitly filtered cohort. Its interpretation depends on reproducible eligibility criteria and consistent price and area definitions.
+
+Roberts \emph{et al.} discuss how temporal and spatial dependence affect validation and recommend aligning the separation of training and test data with the intended prediction setting \cite{roberts}. We apply this principle to possible valuation work by holding out future transactions and considering geographic transfer only where coverage supports it. Lundberg and Lee's SHAP method attributes fitted model predictions to input features \cite{shap}. Attribution, predictive accuracy, and a user's understanding of an answer are distinct outcomes in the proposed evaluation.
+
+\subsection{Tool-Using Agents}
+ReAct interleaves reasoning, actions, and observations so that an external result can inform the next action \cite{react}. Retrieval-augmented generation (RAG) conditions generation on retrieved information \cite{rag}. Haurum \emph{et al.} demonstrate a LangChain-based agent using example real-estate queries \cite{haurum}. These examples motivate a domain-specific agent. The evaluation in this paper instead pairs two controllers on the same transaction evidence and predefines how unsupported claims are scored. Our study examines whether adaptive orchestration changes the evidence support of answers when the controller and a predefined workflow share the same data and tool contracts.
+
+The proposed agent uses ReAct for orchestration and RAG for domain-document retrieval. It draws numerical claims from structured tools with explicit calculation rules. Documentary claims require an applicable source version and passage. This division makes it possible to trace a price statistic back to the queried snapshot and to check whether cited documentary evidence was valid for the requested time and jurisdiction.
